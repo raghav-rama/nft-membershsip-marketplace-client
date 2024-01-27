@@ -1,0 +1,4 @@
+[submodule "contracts"]
+	path = contracts
+	url = https://github.com/raghav-rama/nft-membership-market-contracts
+	branch = master
