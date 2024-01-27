@@ -4,12 +4,19 @@ import * as React from "react";
 import { FaBars, FaTimes } from "react-icons/fa";
 import ConnectButton from "./connect-wallet-btn";
 import { useWeb3ModalEvents } from "@web3modal/wagmi1/react";
+import { useAccount } from "wagmi";
 import { useSignMessage } from "wagmi";
 import { NavBarContext } from "@/context/NavBarContext/NavBar";
 import { AuthContext } from "@/context/AuthContext/Auth";
+import { SanityContext } from "@/context/SanityContext/Sanity";
+import { v4 as uuidv4 } from "uuid";
 import { recoverMessageAddress } from "viem";
 
 const Navbar = () => {
+  const { address } = useAccount();
+
+  const { client } = React.useContext(SanityContext);
+
   const {
     data: signMessageData,
     error,
@@ -18,6 +25,7 @@ const Navbar = () => {
     isSuccess,
     variables,
   } = useSignMessage();
+
   const {
     nav,
     setNav,
@@ -28,6 +36,17 @@ const Navbar = () => {
     links,
     setRecoveredAddress,
   } = React.useContext(NavBarContext);
+
+  const getUser = async () => {
+    const query = `*[_type == "users" && wallet_address == "${address}"]`;
+    const data = await client.fetch(query);
+    console.log("👑 data", data);
+    return data;
+  };
+
+  const randomNumber = Math.floor(Math.random() * 90000000) + 10000000;
+  // this will be our nonce
+
   const { isAuth, setIsAuth } = React.useContext(AuthContext);
   {
     const { data } = useWeb3ModalEvents();
@@ -35,9 +54,17 @@ const Navbar = () => {
       console.log("👑 data.event", data.event);
       if (data.event === "CONNECT_SUCCESS" && !isAuth && connectClicked) {
         console.log("👑 data", data);
+        (async () => {
+          let data = await getUser();
+          if (data.length > 0) {
+            let nonce = data.nonce;
+            signMessage({ message: "Login to Mintpass" + nonce });
+          } else {
+            signMessage({ message: "Login to Mintpass" + randomNumber });
+          }
+        })();
         setConnected(true);
         setConnectClicked(false);
-        signMessage({ message: "Login to Mintpass" });
       }
       if (data.event === "MODAL_OPEN") {
         setConnectClicked(true);
@@ -51,7 +78,32 @@ const Navbar = () => {
   React.useEffect(() => {
     console.log("👑 isSuccess changed, isAuth", isSuccess, isAuth);
     if (isSuccess) {
-      setIsAuth(true);
+      (async () => {
+        let data = await getUser();
+        if (data.length > 0) {
+          console.log("👑 data", data);
+          let signature = data.signature;
+          if (signature === signMessageData) {
+            setIsAuth(true);
+            console.log("👑 authenticated");
+          }
+        } else {
+          const user = {
+            _id: uuidv4(),
+            _type: "users",
+            name: "Sneeky Pete",
+            wallet_address: address,
+            nonce: randomNumber,
+            signature: signMessageData,
+          };
+          (async () => {
+            await client.createIfNotExists(user).then((res) => {
+              console.log("👑 res", res);
+              setIsAuth(true);
+            });
+          })();
+        }
+      })();
       console.log("👑 signMessageData", signMessageData);
     }
   }, [isSuccess]);

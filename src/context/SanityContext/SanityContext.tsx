@@ -20,11 +20,13 @@ export const SanityContextProvider = ({
 
   const useCdn = process.env.NODE_ENV === "production";
   const client = createClient({
+    token: process.env.NEXT_PUBLIC_SANITY_API_KEY,
     projectId,
     dataset,
     apiVersion,
     useCdn,
   });
+
   return (
     <SanityContext.Provider
       value={{ projectId, dataset, apiVersion, useCdn, client }}
