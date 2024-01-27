@@ -1,0 +1,8 @@
+[submodule "contracts"]
+	path = contracts
+	url = https://github.com/raghav-rama/nft-membership-market-contracts
+	branch = master
+[submodule "sanity"]
+	path = sanity
+	url = https://github.com/raghav-rama/nft-membershsip-marketplace-sanity
+	branch = main
