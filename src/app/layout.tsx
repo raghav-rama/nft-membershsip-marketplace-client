@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Web3Modal } from "@/context/Web3Modal";
 import { NavBarContextProvider } from "@/context/NavBarContext/NavBarContext";
+import { AuthContextProvider } from "@/context/AuthContext/AuthContext";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -19,9 +20,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <NavBarContextProvider>
-          <Web3Modal>{children}</Web3Modal>
-        </NavBarContextProvider>
+        <AuthContextProvider>
+          <NavBarContextProvider>
+            <Web3Modal>{children}</Web3Modal>
+          </NavBarContextProvider>
+        </AuthContextProvider>
       </body>
     </html>
   );
