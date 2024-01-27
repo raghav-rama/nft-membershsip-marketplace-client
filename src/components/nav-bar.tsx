@@ -4,9 +4,20 @@ import * as React from "react";
 import { FaBars, FaTimes } from "react-icons/fa";
 import ConnectButton from "./connect-wallet-btn";
 import { useWeb3ModalEvents } from "@web3modal/wagmi1/react";
+import { useSignMessage } from "wagmi";
 import { NavBarContext } from "@/context/NavBarContext/NavBar";
+import { AuthContext } from "@/context/AuthContext/Auth";
+import { recoverMessageAddress } from "viem";
 
 const Navbar = () => {
+  const {
+    data: signMessageData,
+    error,
+    isLoading,
+    signMessage,
+    isSuccess,
+    variables,
+  } = useSignMessage();
   const {
     nav,
     setNav,
@@ -15,22 +26,35 @@ const Navbar = () => {
     connected,
     connectClicked,
     links,
+    setRecoveredAddress,
   } = React.useContext(NavBarContext);
-  const { data } = useWeb3ModalEvents();
+  const { isAuth, setIsAuth } = React.useContext(AuthContext);
+  {
+    const { data } = useWeb3ModalEvents();
+    React.useEffect(() => {
+      console.log("👑 data.event", data.event);
+      if (data.event === "CONNECT_SUCCESS" && !isAuth && connectClicked) {
+        console.log("👑 data", data);
+        setConnected(true);
+        setConnectClicked(false);
+        signMessage({ message: "Login to Mintpass" });
+      }
+      if (data.event === "MODAL_OPEN") {
+        setConnectClicked(true);
+      }
+      if (data.event === "DISCONNECT_SUCCESS") {
+        setConnected(false);
+        setIsAuth(false);
+      }
+    }, [data.event]);
+  }
   React.useEffect(() => {
-    console.log("👑 data.event", data.event);
-    if (data.event === "CONNECT_SUCCESS") {
-      setConnected(true);
-      setConnectClicked(false);
+    console.log("👑 isSuccess changed, isAuth", isSuccess, isAuth);
+    if (isSuccess) {
+      setIsAuth(true);
+      console.log("👑 signMessageData", signMessageData);
     }
-    if (data.event === "MODAL_OPEN") {
-      setConnectClicked(true);
-    }
-    if (data.event === "DISCONNECT_SUCCESS") {
-      setConnected(false);
-    }
-  }, [data.event, connected, connectClicked, setConnectClicked, setConnected]);
-
+  }, [isSuccess]);
   return (
     <div className="flex justify-between items-center w-full h-20 px-4 text-white bg-black fixed nav">
       <div>
@@ -46,7 +70,6 @@ const Navbar = () => {
           </a>
         </h1>
       </div>
-
       <ul className="hidden md:flex">
         {links.map(({ id, link }) => (
           <li
@@ -57,14 +80,12 @@ const Navbar = () => {
           </li>
         ))}
       </ul>
-
       <div
         onClick={() => setNav(!nav)}
         className="cursor-pointer pr-4 z-10 text-gray-500 md:hidden"
       >
         {nav ? <FaTimes size={30} /> : <FaBars size={30} />}
       </div>
-
       {nav && (
         <ul className="flex flex-col justify-center items-center absolute top-0 left-0 w-full h-screen bg-gradient-to-b from-black to-gray-800 text-gray-500">
           {links.map(({ id, link }) => (
@@ -82,6 +103,7 @@ const Navbar = () => {
       {/* <div className="px-4">
         {data.event === "CONNECT_SUCCESS" ? "x" : <ConnectButton />}
       </div> */}
+
       <w3m-button />
     </div>
   );

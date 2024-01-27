@@ -25,8 +25,13 @@ interface INav {
   setNav: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+interface IRecoveredAddress {
+  recoveredAddress: string;
+  setRecoveredAddress: React.Dispatch<React.SetStateAction<string>>;
+}
+
 export const NavBarContext = React.createContext<
-  ILinks & IConnected & IConnectClicked & INav
+  ILinks & IConnected & IConnectClicked & INav & IRecoveredAddress
 >({
   links: [],
   connected: false,
@@ -35,6 +40,8 @@ export const NavBarContext = React.createContext<
   setConnectClicked: () => {},
   nav: false,
   setNav: () => {},
+  recoveredAddress: "",
+  setRecoveredAddress: () => {},
 });
 
 export type ChildrenType = {

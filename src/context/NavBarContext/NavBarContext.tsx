@@ -26,6 +26,7 @@ export const NavBarContextProvider = ({
       link: "about",
     },
   ];
+  const [recoveredAddress, setRecoveredAddress] = React.useState<string>("");
   const [connected, setConnected] = React.useState<boolean>(false);
   const [connectClicked, setConnectClicked] = React.useState<boolean>(false);
   const [nav, setNav] = React.useState<boolean>(false);
@@ -39,6 +40,8 @@ export const NavBarContextProvider = ({
         setConnectClicked,
         nav,
         setNav,
+        recoveredAddress,
+        setRecoveredAddress,
       }}
     >
       {children}
