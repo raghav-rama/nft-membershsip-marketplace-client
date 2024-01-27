@@ -9,11 +9,23 @@ interface ISanityContext {
   useCdn: boolean;
 }
 
-export const SanityContext = React.createContext<ISanityContext>({
+interface ISanityClient {
+  client: ReturnType<typeof createClient>;
+}
+
+export const SanityContext = React.createContext<
+  ISanityContext & ISanityClient
+>({
   projectId: "",
   dataset: "",
   apiVersion: "",
   useCdn: false,
+  client: createClient({
+    projectId: "asdwer",
+    dataset: "sfasfw",
+    apiVersion: "2024-11-11",
+    useCdn: false,
+  }),
 });
 
 export type ChildrenType = {
