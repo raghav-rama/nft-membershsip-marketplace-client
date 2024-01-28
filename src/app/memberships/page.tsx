@@ -61,7 +61,6 @@ function Memberships() {
             return <div key={i}>{v + "" + i}</div>;
           })}
       </p>
-      <div>{data}</div>
     </div>
   );
 }
