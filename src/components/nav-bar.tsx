@@ -57,9 +57,11 @@ const Navbar = () => {
         (async () => {
           let data = await getUser();
           if (data.length > 0) {
-            let nonce = data.nonce;
+            let nonce = await data[0].nonce;
+            console.log("👑 nonce", nonce);
             signMessage({ message: "Login to Mintpass" + nonce });
           } else {
+            console.log("👑 randomNumber", randomNumber);
             signMessage({ message: "Login to Mintpass" + randomNumber });
           }
         })();
@@ -82,10 +84,20 @@ const Navbar = () => {
         let data = await getUser();
         if (data.length > 0) {
           console.log("👑 data", data);
-          let signature = data.signature;
+          let signature = await data[0].signature;
+          console.log("👑 signature", signature);
           if (signature === signMessageData) {
             setIsAuth(true);
             console.log("👑 authenticated");
+          } else {
+            client
+              .patch(data[0]._id)
+              .set({ signature: signMessageData })
+              .commit()
+              .then((res) => {
+                console.log("👑 user patched", res);
+                setIsAuth(true);
+              });
           }
         } else {
           const user = {
