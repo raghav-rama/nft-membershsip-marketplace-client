@@ -38,7 +38,7 @@ const Navbar = () => {
   } = React.useContext(NavBarContext);
 
   const getUser = async () => {
-    const query = `*[_type == "users" && wallet_address == "${address}"]`;
+    const query = `*[_type == "users" && walletAddress == "${address}"]`;
     const data = await client.fetch(query);
     console.log("👑 data", data);
     return data;
@@ -104,7 +104,7 @@ const Navbar = () => {
             _id: uuidv4(),
             _type: "users",
             name: "Sneeky Pete",
-            wallet_address: address,
+            walletAddress: address,
             nonce: randomNumber,
             signature: signMessageData,
           };
