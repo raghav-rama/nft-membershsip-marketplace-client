@@ -26,10 +26,13 @@ function Memberships() {
     description: string;
   }
 
-  const [apiData, setApiData] = React.useState<Array<NFT | undefined>>();
+  type ApiDataType = NFT;
+
+  const [apiData, setApiData] = React.useState<Array<NFT>>();
   if (!process.env.NEXT_PUBLIC_CONTRACT_ADDRESS) {
     throw new Error("Missing contract address");
   }
+
   const { client } = React.useContext(SanityContext);
   const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS.substring(2);
   const { data, isLoading, isSuccess } = useContractRead({
@@ -39,30 +42,40 @@ function Memberships() {
     args: [address],
     chainId: sepolia.id,
   });
+
   const getOwndedNFT = async () => {
     const query = `*[_type == "nft"]`;
-    const data = (await client.fetch(query)) as Array<any>;
+    const data = await client.fetch(query);
     console.log("👑 typeof data", typeof data);
     console.log("👑 data", data);
     return data;
   };
   React.useEffect(() => {
+    let data;
     (async () => {
-      const data = (await getOwndedNFT()) as Array<any>;
+      data = await getOwndedNFT();
+      setApiData(data);
     })();
-    setApiData(data as (NFT | undefined)[]);
   }, []);
+  const mapToScreen = (data: Array<ApiDataType>) => {
+    return data.map((item) => {
+      return (
+        <div key={item._id}>
+          <h1>{"name: " + item.name}</h1>
+          <p>{"image: " + item.image}</p>
+          <p>{"description: " + item.description}</p>
+        </div>
+      );
+    });
+  };
+
   return (
     <div>
       <h1>Memberships</h1>
-      <p>
-        {Array.isArray(apiData) &&
-          apiData.map((v, i) => {
-            return <div key={i}>{v + "" + i}</div>;
-          })}
-      </p>
+      {!apiData ? "loading..." : mapToScreen(apiData)}
     </div>
   );
 }
 
-export default isAuth(Memberships);
+export default Memberships;
+// export default isAuth(Memberships);
