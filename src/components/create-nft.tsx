@@ -64,14 +64,22 @@ function CreateNFT() {
   // }
   const [name, setName] = React.useState<string>("x");
   const [ticker, setTicker] = React.useState<string>("x");
-  const { data, isLoading, isSuccess, write, isIdle, variables } =
-    useContractWrite({
-      address: `0x${contractAddress}`,
-      abi,
-      functionName: "createToken",
-      chainId: activeChainId,
-      args: [name, ticker],
-    });
+  const {
+    data,
+    isLoading,
+    isSuccess,
+    write,
+    isIdle,
+    variables,
+    isError,
+    error,
+  } = useContractWrite({
+    address: `0x${contractAddress}`,
+    abi,
+    functionName: "createToken",
+    chainId: activeChainId,
+    args: [name, ticker],
+  });
   const handleClick = (e: React.MouseEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log("🎷 id", activeChainId);
@@ -121,7 +129,10 @@ function CreateNFT() {
           ) : isIdle ? (
             "Create your token to get started"
           ) : (
-            "Failed to create your token"
+            <div className="flex h-10 justify-center items-center gap-1">
+              {"Error creating nft..."}
+              <NFTCreationError error={error} />
+            </div>
           )}
         </div>
       </div>
@@ -164,6 +175,15 @@ const Loader = () => {
         visible={true}
       />
     </div>
+  );
+};
+
+const NFTCreationError = ({ error }: { error: Error | null }) => {
+  return (
+    <>
+      {error?.message}
+      {error?.name}
+    </>
   );
 };
 
