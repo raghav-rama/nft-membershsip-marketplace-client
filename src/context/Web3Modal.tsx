@@ -6,7 +6,7 @@ import { walletConnectProvider, EIP6963Connector } from "@web3modal/wagmi1";
 import { WagmiConfig, configureChains, createConfig } from "wagmi";
 import { publicProvider } from "wagmi/providers/public";
 import { alchemyProvider } from "wagmi/providers/alchemy";
-import { mainnet, sepolia } from "viem/chains";
+import { mainnet, sepolia, polygonMumbai } from "viem/chains";
 import { CoinbaseWalletConnector } from "wagmi/connectors/coinbaseWallet";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
@@ -24,7 +24,7 @@ if (!alchemyApiKey) {
 
 // 2. Create wagmiConfig
 const { chains, publicClient } = configureChains(
-  [mainnet, sepolia],
+  [mainnet, sepolia, polygonMumbai],
   [
     walletConnectProvider({ projectId }),
     alchemyProvider({ apiKey: alchemyApiKey }),
